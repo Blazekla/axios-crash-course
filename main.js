@@ -79,6 +79,18 @@ function removeTodo() {
 // SIMULTANEOUS DATA
 function getData() {
   console.log("Simultaneous Request");
+  axios
+    .all([
+      axios.get("https://jsonplaceholder.typicode.com/todos?_limit=5"),
+      axios.get("https://jsonplaceholder.typicode.com/posts?_limit=5")
+    ])
+    // .then(res => {
+    //   console.log(res[0]);
+    //   console.log(res[1]);
+    //   return showOutput(res[0]);
+    // })
+    .then(axios.spread((todos, posts) => showOutput(todos)))
+    .catch(err => console.error(err));
 }
 
 // CUSTOM HEADERS
@@ -102,7 +114,20 @@ function cancelToken() {
 }
 
 //INTERCEPTING REQUESTS AND RESPONSES
+axios.interceptors.request.use(
+  config => {
+    console.log(
+      `${config.method.toUpperCase()} request send to ${
+        config.url
+      } at ${new Date().getTime()}`
+    );
 
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
 //AXIOS INSTANCES
 
 //Show output in browser
